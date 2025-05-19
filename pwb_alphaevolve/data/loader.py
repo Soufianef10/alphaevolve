@@ -1,5 +1,5 @@
 """
-Efficient data-loading helpers built on top of pwb-toolbox.
+Efficient data-loading helpers using `yfinance`.
 
 Usage
 -----
@@ -9,13 +9,11 @@ cerebro    = bt.Cerebro()
 add_feeds_to_cerebro(price_df, cerebro)
 """
 
-from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
-from typing import Iterable
 
 import pandas as pd
-import pwb_toolbox.datasets as pwb_ds
+import yfinance as yf
 import backtrader as bt
 from tqdm import tqdm
 
@@ -28,24 +26,23 @@ def load_ohlc(
     symbols: tuple[str, ...],
     start: str | None = None,
     end: str | None = None,
-    dataset: str = "ETFs-Daily-Price",
+    dataset: str = "yfinance",
 ) -> pd.DataFrame:
     """Return OHLC dataframe indexed by date with a 2-level column (field, symbol)."""
-    symbols = list(symbols)
-    df = pwb_ds.load_dataset(dataset, symbols, extend=True)
-    if start:
-        df = df[df["date"] >= start]
-    if end:
-        df = df[df["date"] <= end]
+    tickers = " ".join(symbols)
+    df = yf.download(tickers, start=start, end=end, group_by="column", progress=False)
 
-    # pivot to (field, symbol) MultiIndex
-    pivot_df = pd.pivot_table(
-        df,
-        index="date",
-        columns="symbol",
-        values=["open", "high", "low", "close", "volume"],
-        aggfunc="first",
-    ).sort_index()
+    # yfinance returns single-index columns for one ticker; unify to MultiIndex
+    if not isinstance(df.columns, pd.MultiIndex):
+        df.columns = pd.MultiIndex.from_product([df.columns, symbols])
+
+    df = df.rename(columns={"Adj Close": "Close"})
+    df.columns = pd.MultiIndex.from_tuples(
+        (str(field).lower(), sym) for field, sym in df.columns
+    )
+    df.index.name = "date"
+
+    pivot_df = df.sort_index()
 
     # fill weekends / holidays → NaNs; forward-fill to trading days later
     full_range = pd.date_range(pivot_df.index.min(), pivot_df.index.max(), freq="D")

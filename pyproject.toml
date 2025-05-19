@@ -28,7 +28,7 @@ classifiers = [
 # Runtime dependencies
 # ---------------------------------------------------------------------
 dependencies = [
-  "pwb-toolbox>=0.1.2",
+  "yfinance>=0.2",
   "pwb-backtrader>=1.9.78.123",
   "backtrader>=1.9",
   "openai>=1.0",
