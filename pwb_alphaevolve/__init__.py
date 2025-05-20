@@ -3,4 +3,5 @@
 __all__ = [
     "data",
     "strategies",
+    "utils",
 ]

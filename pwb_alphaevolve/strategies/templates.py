@@ -5,6 +5,7 @@ controller.
 """
 
 import backtrader as bt
+
 from .base import BaseLoggingStrategy
 
 
@@ -12,13 +13,12 @@ from .base import BaseLoggingStrategy
 # ☀️  Template 1 – 10-month SMA cross on multiple assets
 # ---------------------------------------------------------------------
 class SMAMomentum(BaseLoggingStrategy):
-    params = dict(leverage=0.9, sma_period=210)
+    params = {"leverage": 0.9, "sma_period": 210}
 
     def __init__(self):
         super().__init__()
         self.sma = {
-            d._name: bt.indicators.SMA(d.close, period=self.p.sma_period)
-            for d in self.datas
+            d._name: bt.indicators.SMA(d.close, period=self.p.sma_period) for d in self.datas
         }
         self.last_month = -1
 
@@ -31,9 +31,7 @@ class SMAMomentum(BaseLoggingStrategy):
             return  # rebalance monthly
         self.last_month = today.month
 
-        tradable = [
-            d for d in self.datas if len(self.sma[d._name]) >= self.p.sma_period
-        ]
+        tradable = [d for d in self.datas if len(self.sma[d._name]) >= self.p.sma_period]
         longs = [d for d in tradable if d.close[0] > self.sma[d._name][0]]
 
         weight = self.p.leverage / len(longs) if longs else 0.0
@@ -47,13 +45,12 @@ class SMAMomentum(BaseLoggingStrategy):
 # ☀️  Template 2 – Volatility-adjusted momentum (placeholder)
 # ---------------------------------------------------------------------
 class VolAdjMomentum(BaseLoggingStrategy):
-    params = dict(leverage=0.95, lookback=63)
+    params = {"leverage": 0.95, "lookback": 63}
 
     def __init__(self):
         super().__init__()
         self.roc = {
-            d._name: bt.indicators.RateOfChange(d.close, period=self.p.lookback)
-            for d in self.datas
+            d._name: bt.indicators.RateOfChange(d.close, period=self.p.lookback) for d in self.datas
         }
         self.std = {
             d._name: bt.indicators.StandardDeviation(d.close, period=self.p.lookback)
