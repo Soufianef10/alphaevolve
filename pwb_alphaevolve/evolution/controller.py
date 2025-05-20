@@ -8,16 +8,18 @@ High‑level loop:
 5. Insert child into store (which updates MAP‑Elites grid).
 """
 
-import asyncio, json, inspect, textwrap, logging
+import asyncio
+import inspect
+import json
+import logging
 import textwrap
-from typing import Optional
 
-from pwb_alphaevolve.strategies.base import BaseLoggingStrategy
-from pwb_alphaevolve.store.sqlite import ProgramStore
-from pwb_alphaevolve.llm_engine import prompts, openai_client
-from pwb_alphaevolve.evolution.patching import apply_patch
 from pwb_alphaevolve.evaluator.backtest import evaluate
+from pwb_alphaevolve.evolution.patching import apply_patch
+from pwb_alphaevolve.llm_engine import openai_client, prompts
+from pwb_alphaevolve.store.sqlite import ProgramStore
 from pwb_alphaevolve.strategies import templates  # seed strategies
+from pwb_alphaevolve.strategies.base import BaseLoggingStrategy
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +43,7 @@ class Controller:
             self.store.insert(code, metrics=None, parent_id=None)
         logger.info("Seed strategies inserted into store.")
 
-    async def _spawn(self, parent_id: Optional[str]):
+    async def _spawn(self, parent_id: str | None):
         """Generate, evaluate & store one child strategy."""
         async with self.sem:
             # 1) Select parent
@@ -62,18 +64,14 @@ class Controller:
             try:
                 diff_json = json.loads(msg.content)
             except json.JSONDecodeError as e:
-                logger.error(
-                    f"Model did not return valid JSON: {e}\n{msg.content[:500]}"
-                )
+                logger.error(f"Model did not return valid JSON: {e}\n{msg.content[:500]}")
                 return
 
             child_startegy = apply_patch(parent["code"], diff_json)
 
             imports = "from collections import deque\nimport backtrader as bt"
             base_cls = inspect.getsource(BaseLoggingStrategy)
-            child_code = textwrap.dedent(
-                imports + "\n\n" + base_cls + "\n\n" + child_startegy
-            )
+            child_code = textwrap.dedent(imports + "\n\n" + base_cls + "\n\n" + child_startegy)
 
             # 4) Evaluate
             try:
