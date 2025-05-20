@@ -7,7 +7,7 @@ import pandas as pd
 
 
 def _to_np(arr):
-    if isinstance(arr, (pd.Series, pd.DataFrame)):
+    if isinstance(arr, pd.Series | pd.DataFrame):
         arr = arr.values
     return np.asarray(arr, dtype=float)
 

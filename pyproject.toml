@@ -63,7 +63,7 @@ Issues = "https://github.com/your-org/pwb-alphaevolve/issues"
 # ---------------------------------------------------------------------
 [tool.hatch.build.targets.wheel]
 include = [
-  "alpha_trader/**",
+  "pwb_alphaevolve/**",
   "scripts/**",
   "README.md",
   "LICENSE",
@@ -73,8 +73,8 @@ include = [
 # Console‑script entry points
 # ---------------------------------------------------------------------
 [project.scripts]
-run-controller = "alpha_trader.scripts.run_controller:main"
-quick-backtest = "alpha_trader.scripts.quick_backtest:main"
+run-controller = "pwb_alphaevolve.scripts.run_controller:main"
+quick-backtest = "pwb_alphaevolve.scripts.quick_backtest:main"
 
 # ---------------------------------------------------------------------
 # Tool configurations (style, lint) kept local to PyPI package

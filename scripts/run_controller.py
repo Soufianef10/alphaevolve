@@ -2,12 +2,12 @@
 """Package-local wrapper that forwards to the top-level `scripts/run_controller.py`.
 
 Installing via `pip` exposes the console-script `run-controller` (declared in
-pyproject.toml) which calls `alpha_trader.scripts.run_controller:main`.
+pyproject.toml) which calls `pwb_alphaevolve.scripts.run_controller:main`.
 
 If you’re running directly from source, you can still do either:
 
     python scripts/run_controller.py          # path relative clone root
-    python -m alpha_trader.scripts.run_controller  # package module
+    python -m pwb_alphaevolve.scripts.run_controller  # package module
 """
 from __future__ import annotations
 import importlib.resources as pkg_resources

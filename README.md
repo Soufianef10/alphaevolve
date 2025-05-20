@@ -19,6 +19,7 @@
 | LLM Engine | OpenAI o3 structured‑output chat → JSON diff/patch system                                   |
 | Evolution  | Async controller, SQLite hall‑of‑fame, optional MAP‑Elites niches                           |
 | Dashboard  | (optional) Streamlit live view of metrics & equity curves                                   |
+| Utilities  | Market regime filters for correlation-based signals |
 
 ---
 
@@ -46,7 +47,7 @@ The dashboard uses Streamlit to visualize the evolution process and back‑test 
 ## 📂 Project structure (high‑level)
 
 ```
-alpha_trader/
+pwb_alphaevolve/
 ├── data/          # loaders & helpers using yfinance
 ├── strategies/    # seed strategies (EVOLVE‑BLOCK markers)
 ├── evaluator/     # Backtrader KPIs & walk‑forward
